@@ -841,6 +841,7 @@ define([
             // Fill the interior of the shape.
             if (!this._isInteriorInhibited && attributes.drawInterior) {
                 ctx2D.fillStyle = isPicking ? this.pickColor.toHexString(false) : attributes.interiorColor.toHexString(false);
+                ctx2D.globalAlpha = 0.8;
 
                 for (idx = 0, len = this._interiorGeometry.length; idx < len; idx += 1) {
                     idxPath = 0;
@@ -863,6 +864,8 @@ define([
                         ctx2D.fill();
                     }
                 }
+
+                ctx2D.globalAlpha = 1;
             }
 
             // Draw the outline of the shape.

@@ -179,7 +179,7 @@ define([
              * @default false
              * @memberof Polygon.prototype
              */
-            extrude: {
+            extrudeextrude: {
                 get: function () {
                     return this._extrude;
                 },
@@ -365,18 +365,35 @@ define([
                     boundaryPoints[b][k + 2] = pt[2];
 
                     if (this._extrude) {
-                        dc.surfacePointForMode(pos.latitude, pos.longitude, 0, WorldWind.CLAMP_TO_GROUND, pt);
+                        if(!this._onTop) {
+                            // Here allow drawing the polygon on top of other polygon.
+                            dc.surfacePointForMode(pos.latitude, pos.longitude, 0, WorldWind.CLAMP_TO_GROUND, pt);
 
-                        dSquared = pt.distanceToSquared(eyePoint);
-                        if (dSquared < eyeDistSquared) {
-                            eyeDistSquared = dSquared;
+                            dSquared = pt.distanceToSquared(eyePoint);
+                            if (dSquared < eyeDistSquared) {
+                                eyeDistSquared = dSquared;
+                            }
+
+                            pt.subtract(this.currentData.referencePoint);
+
+                            boundaryPoints[b][k + 3] = pt[0];
+                            boundaryPoints[b][k + 4] = pt[1];
+                            boundaryPoints[b][k + 5] = pt[2];
+                        } else {
+                            // Here allow drawing the polygon on top of other polygon.
+                            dc.surfacePointForMode(pos.latitude, pos.longitude, 0, WorldWind.RELATIVE_TO_GROUND, pt);
+
+                            dSquared = pt.distanceToSquared(eyePoint);
+                            if (dSquared < eyeDistSquared) {
+                                eyeDistSquared = dSquared;
+                            }
+
+                            pt.subtract(this.currentData.referencePoint);
+
+                            boundaryPoints[b][k + 3] = pt[0];
+                            boundaryPoints[b][k + 4] = pt[1];
+                            boundaryPoints[b][k + 5] = pt[2];
                         }
-
-                        pt.subtract(this.currentData.referencePoint);
-
-                        boundaryPoints[b][k + 3] = pt[0];
-                        boundaryPoints[b][k + 4] = pt[1];
-                        boundaryPoints[b][k + 5] = pt[2];
                     }
                 }
             }
