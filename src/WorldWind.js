@@ -11,6 +11,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/Annotation',
         './shapes/AnnotationAttributes',
         './error/ArgumentError',
+        './layer/AtmosphereLayer',
+        './shaders/AtmosphereProgram',
         './shaders/BasicProgram',
         './shaders/BasicTextureProgram',
         './layer/BingAerialLayer',
@@ -212,6 +214,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Annotation,
               AnnotationAttributes,
               ArgumentError,
+              AtmosphereLayer,
+              AtmosphereProgram,
               BasicProgram,
               BasicTextureProgram,
               BingAerialLayer,
@@ -622,6 +626,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Annotation'] = Annotation;
         WorldWind['AnnotationAttributes'] = AnnotationAttributes;
         WorldWind['ArgumentError'] = ArgumentError;
+        WorldWind['AtmosphereLayer'] = AtmosphereLayer;
+        WorldWind['AtmosphereProgram'] = AtmosphereProgram;
         WorldWind['BasicProgram'] = BasicProgram;
         WorldWind['BasicTextureProgram'] = BasicTextureProgram;
         WorldWind['BingAerialLayer'] = BingAerialLayer;
