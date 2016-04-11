@@ -7,21 +7,17 @@
  */
 define([
         '../error/ArgumentError',
-        '../shaders/AtmosphereProgram',
         '../layer/Layer',
-        '../geom/Location',
         '../util/Logger',
-        '../geom/Matrix',
         '../geom/Sector',
+        '../shaders/SkyProgram',
         '../geom/Vec3'
     ],
     function (ArgumentError,
-              AtmosphereProgram,
               Layer,
-              Location,
               Logger,
-              Matrix,
               Sector,
+              SkyProgram,
               Vec3) {
         "use strict";
 
@@ -37,16 +33,6 @@ define([
 
             this.pickEnabled = false;
 
-            this.nightImageSource = null;
-
-            this.lightLocation = new Location();
-
-            this._mvpMatrix = new Matrix();
-
-            this.texCoordMatrix = new Matrix();
-
-            this.vector = new Vec3();
-
             this._fullSphereSector = Sector.FULL_SPHERE;
 
             this._skyWidth = 128;
@@ -56,9 +42,6 @@ define([
             this._skyPoints = null;
 
             this._skyTriStrip = null;
-
-            this._scratchMatrix = Matrix.fromIdentity();
-
         };
 
         AtmosphereLayer.prototype = Object.create(Layer.prototype);
@@ -70,24 +53,25 @@ define([
 
         AtmosphereLayer.prototype.drawSky = function(dc) {
             var gl = dc.currentGlContext,
-                program = dc.findAndBindProgram(AtmosphereProgram);
+                program = dc.findAndBindProgram(SkyProgram);
 
             program.loadGlobe(gl, dc.globe);
 
-            var eyePoint = dc.navigatorState.eyePoint;
             program.loadEyePoint(gl, dc.navigatorState.eyePoint);
 
-            var vertexOriginArray = [0, 0, 0];
-            program.loadVertexOrigin(gl, vertexOriginArray);
+            program.loadVertexOrigin(gl, Vec3.ZERO);
 
-            // Use the draw context's modelview projection matrix.
             program.loadModelviewProjection(gl, dc.navigatorState.modelviewProjection);
 
             program.loadFragMode(gl, program.FRAGMODE_SKY);
 
-            var res = new Vec3(eyePoint[0], eyePoint[1], eyePoint[2]);
-            program.loadLightDirection(gl, res);
+            program.loadLightDirection(gl, dc.navigatorState.eyePoint.normalize());
 
+            gl.uniform1f(program.scaleLocation, 1 / program.getAltitude());
+
+            gl.uniform1f(program.scaleDepthLocation, program.getScaleDepth());
+
+            gl.uniform1f(program.scaleOverScaleDepthLocation, (1 / program.getAltitude()) / program.getScaleDepth());
 
             gl.depthMask(false);
             gl.frontFace(gl.CW);
@@ -171,4 +155,3 @@ define([
 
         return AtmosphereLayer;
     });
-

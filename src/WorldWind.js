@@ -159,6 +159,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/ShapeAttributes',
         './formats/shapefile/Shapefile',
         './layer/ShowTessellationLayer',
+        './shaders/SkyProgram',
         './shapes/SurfaceImage',
         './shapes/SurfaceCircle',
         './shapes/SurfaceEllipse',
@@ -362,6 +363,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ShapeAttributes,
               Shapefile,
               ShowTessellationLayer,
+              SkyProgram,
               SurfaceImage,
               SurfaceCircle,
               SurfaceEllipse,
@@ -723,6 +725,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ShapeAttributes'] = ShapeAttributes;
         WorldWind['Shapefile'] = Shapefile;
         WorldWind['ShowTessellationLayer'] = ShowTessellationLayer;
+        WorldWind['SkyProgram'] = SkyProgram;
         WorldWind['SurfaceImage'] = SurfaceImage;
         WorldWind['SurfaceCircle'] = SurfaceCircle;
         WorldWind['SurfaceEllipse'] = SurfaceEllipse;
