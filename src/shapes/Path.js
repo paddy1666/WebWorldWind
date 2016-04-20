@@ -99,6 +99,9 @@ define([
             this.referencePosition = this.determineReferencePosition(this._positions);
 
             this.scratchPoint = new Vec3(0, 0, 0); // scratch variable
+
+            this._markModified = false;
+            this._cacheKeys = [];
         };
 
         Path.prototype = Object.create(AbstractShape.prototype);
@@ -121,6 +124,7 @@ define([
 
                     this._positions = positions;
                     this.referencePosition = this.determineReferencePosition(this._positions);
+                    this._markModified = true;
                     this.reset();
                 }
             },
@@ -137,6 +141,7 @@ define([
                 },
                 set: function (followTerrain) {
                     this._followTerrain = followTerrain;
+                    this._markModified = true;
                     this.reset();
                 }
             },
@@ -155,6 +160,7 @@ define([
                 },
                 set: function (terrainConformance) {
                     this._terrainConformance = terrainConformance;
+                    this._markModified = true;
                     this.reset();
                 }
             },
@@ -175,6 +181,7 @@ define([
                 },
                 set: function (numSubSegments) {
                     this._numSubSegments = numSubSegments >= 0 ? numSubSegments : 0;
+                    this._markModified = true;
                     this.reset();
                 }
             },
@@ -196,6 +203,7 @@ define([
                 },
                 set: function (pathType) {
                     this._pathType = pathType;
+                    this._markModified = true;
                     this.reset();
                 }
             },
@@ -213,6 +221,7 @@ define([
                 },
                 set: function (extrude) {
                     this._extrude = extrude;
+                    this._markModified = true;
                     this.reset();
                 }
             }
@@ -508,6 +517,7 @@ define([
 
             if (!currentData.vboCacheKey) {
                 currentData.vboCacheKey = dc.gpuResourceCache.generateCacheKey();
+                this.saveKeyEntry(currentData.vboCacheKey);
             }
 
             vboId = dc.gpuResourceCache.resourceForKey(currentData.vboCacheKey);
@@ -580,6 +590,7 @@ define([
                 if (this.mustDrawVerticals(dc)) {
                     if (!currentData.verticalIndicesVboCacheKey) {
                         currentData.verticalIndicesVboCacheKey = dc.gpuResourceCache.generateCacheKey();
+                        this.saveKeyEntry(currentData.verticalIndicesVboCacheKey);
                     }
 
                     vboId = dc.gpuResourceCache.resourceForKey(currentData.verticalIndicesVboCacheKey);
@@ -615,6 +626,10 @@ define([
         Path.prototype.beginDrawing = function (dc) {
             var gl = dc.currentGlContext;
 
+            if (this._markModified){
+                this.destroy(dc);
+            }
+
             if (this.mustDrawInterior(dc)) {
                 gl.disable(gl.CULL_FACE);
             }
@@ -631,6 +646,22 @@ define([
             gl.depthMask(true);
             gl.lineWidth(1);
             gl.enable(gl.CULL_FACE);
+        };
+
+        Path.prototype.saveKeyEntry = function (keyEntry) {
+            var index = this._cacheKeys.indexOf(keyEntry);
+            if (index === -1) {
+                this._cacheKeys.push(keyEntry);
+            }
+        };
+
+        Path.prototype.destroy = function (dc) {
+            this._cacheKeys.forEach(function (keyEntry) {
+                dc.gpuResourceCache.removeResource(keyEntry);
+            });
+
+            this._cacheKeys.length = 0;
+            this._markModified = false;
         };
 
         return Path;
