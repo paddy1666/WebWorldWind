@@ -76,6 +76,15 @@ requirejs(['../src/WorldWind',
         shape.highlightAttributes = highlightAttributes;
         shapesLayer.addRenderable(shape);
 
+        boundaries = [];
+        boundaries.push(new WorldWind.Location(0, -90));
+        boundaries.push(new WorldWind.Location(10, -90));
+        boundaries.push(new WorldWind.Location(10, -80));
+        boundaries.push(new WorldWind.Location(0, -80));
+        shape = new WorldWind.SurfacePolygon(boundaries, attributes);
+        shape.highlightAttributes = highlightAttributes;
+        shapesLayer.addRenderable(shape);
+
         // Create a surface circle with a radius of 200 km.
         shape = new WorldWind.SurfaceCircle(new WorldWind.Location(35, -120), 200e3, attributes);
         shape.highlightAttributes = highlightAttributes;
