@@ -12,6 +12,7 @@ define([
         '../error/ArgumentError',
         '../globe/ElevationImage',
         '../globe/ElevationTile',
+        '../formats/geotiff/GeoTiffReader',
         '../util/LevelSet',
         '../util/Logger',
         '../cache/MemoryCache',
@@ -23,6 +24,7 @@ define([
               ArgumentError,
               ElevationImage,
               ElevationTile,
+              GeoTiffReader,
               LevelSet,
               Logger,
               MemoryCache,
@@ -459,7 +461,8 @@ define([
             // If the tile's elevations have expired, cause it to be re-retrieved. Note that the current,
             // expired elevations are still used until the updated ones arrive.
             if (image == null && retrieveTiles) {
-                this.retrieveTileImage(tile);
+                //this.retrieveTileImage(tile);
+                this.retrieveTileImageTestWcs(tile);
             }
 
             return image;
@@ -664,6 +667,47 @@ define([
                 elevationImage.size = elevationImage.imageData.length * 4;
             }
 
+            if (elevationImage.imageData) {
+                elevationImage.findMinAndMaxElevation();
+                this.imageCache.putEntry(tile.imagePath, elevationImage, elevationImage.size);
+                this.timestamp = Date.now();
+            }
+        };
+
+        //Servet test wcs
+        ElevationModel.prototype.retrieveTileImageTestWcs = function (tile) {
+            if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
+                var url = this.resourceUrlForTile(tile, this.retrievalImageFormat),
+                    xhr = new XMLHttpRequest(),
+                    elevationModel = this;
+
+
+                if (!url)
+                    return;
+
+                var geotiffObject = new GeoTiffReader(url);
+
+                var geoTiffData = geotiffObject.readAsData(function (elevData) {
+                    elevationModel.loadElevationImageTestWcs(tile, elevData);
+                    elevationModel.absentResourceList.unmarkResourceAbsent(tile.imagePath);
+
+                    // Send an event to request a redraw.
+                    var e = document.createEvent('Event');
+                    e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
+                    window.dispatchEvent(e);
+                });
+
+                this.currentRetrievals.push(tile.imagePath);
+            }
+        };
+
+        ElevationModel.prototype.loadElevationImageTestWcs = function (tile, elevData) {
+            var elevationImage = new ElevationImage(tile.imagePath, tile.sector, tile.tileWidth, tile.tileHeight);
+
+            elevationImage.imageData = elevData;
+            elevationImage.size = elevationImage.imageData.length * 2;
+
+            //console.log(elevationImage.imageData);
             if (elevationImage.imageData) {
                 elevationImage.findMinAndMaxElevation();
                 this.imageCache.putEntry(tile.imagePath, elevationImage, elevationImage.size);
