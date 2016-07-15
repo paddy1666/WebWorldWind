@@ -56,21 +56,24 @@ define([
             }
 
             var cachePath = config.service + config.layerNames + config.styleNames;
+            this.cachePathWithoutTime = cachePath;
             if (timeString) {
                 cachePath = cachePath + timeString;
             }
 
-            TiledImageLayer.call(this, config.sector, config.levelZeroDelta, config.numLevels, config.format,
-                cachePath, config.size, config.size);
+            this.initTiledImageLayer(config, cachePath);
+            // TiledImageLayer.call(this, config.sector, config.levelZeroDelta, config.numLevels, config.format,
+            //     cachePath, config.size, config.size);
 
             this.displayName = config.title;
             this.pickEnabled = false;
 
-            this.urlBuilder = new WmsUrlBuilder(config.service, config.layerNames, config.styleNames, config.version,
-                timeString);
-            if (config.coordinateSystem) {
-                this.urlBuilder.crs = config.coordinateSystem;
-            }
+            this.updateUrlBuilder(config, timeString);
+            // this.urlBuilder = new WmsUrlBuilder(config.service, config.layerNames, config.styleNames, config.version,
+            //     timeString);
+            // if (config.coordinateSystem) {
+            //     this.urlBuilder.crs = config.coordinateSystem;
+            // }
 
             /**
              * The time string passed to this layer's constructor.
@@ -78,6 +81,7 @@ define([
              * @readonly
              */
             this.timeString = timeString;
+            this.config = config;
         };
 
         WmsLayer.prototype = Object.create(TiledImageLayer.prototype);
@@ -189,6 +193,35 @@ define([
             }
 
             return parsedDimensions;
+        };
+
+        WmsLayer.prototype.initTiledImageLayer = function(config, cachePath){
+            TiledImageLayer.call(this, config.sector, config.levelZeroDelta, config.numLevels, config.format,
+              cachePath, config.size, config.size);
+        };
+
+        WmsLayer.prototype.updateUrlBuilder = function (config, timeString) {
+            this.urlBuilder = new WmsUrlBuilder(config.service, config.layerNames, config.styleNames, config.version,
+              timeString);
+            if (config.coordinateSystem) {
+                this.urlBuilder.crs = config.coordinateSystem;
+            }
+        };
+
+        /**
+         * Updates a WMS layers time without removing and adding layer again.
+         * @param timeString
+         */
+        WmsLayer.prototype.updateTime = function (timeString) {
+            if(timeString) {
+                this.cachePath = this.cachePathWithoutTime + timeString;
+            } else {
+                this.cachePath = this.cachePathWithoutTime;
+            }
+
+            this.updateUrlBuilder(this.config, timeString);
+            this.initTiledImageLayer(this.config, this.cachePath);
+            this.refresh();
         };
 
         return WmsLayer;
