@@ -158,6 +158,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './shapes/ScreenImage',
         './shapes/ScreenText',
         './geom/Sector',
+        './util/SelectionController',
         './shapes/ShapeAttributes',
         './formats/shapefile/Shapefile',
         './layer/ShowTessellationLayer',
@@ -364,6 +365,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               ScreenImage,
               ScreenText,
               Sector,
+              SelectionController,
               ShapeAttributes,
               Shapefile,
               ShowTessellationLayer,
@@ -728,6 +730,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['ScreenText'] = ScreenText;
         WorldWind['ScreenImage'] = ScreenImage;
         WorldWind['Sector'] = Sector;
+        WorldWind['SelectionController'] = SelectionController;
         WorldWind['ShapeAttributes'] = ShapeAttributes;
         WorldWind['Shapefile'] = Shapefile;
         WorldWind['ShowTessellationLayer'] = ShowTessellationLayer;
