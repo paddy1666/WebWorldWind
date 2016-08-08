@@ -61,7 +61,7 @@ requirejs(['../src/WorldWind',
                 var count = 0;
                 for(var confIndex in wmtsCaps.contents.layer){
 
-                    if(Math.random() > 0.8){ // load only random ~20 % of layers
+                    if(Math.random() > 0.05){ // load only random ~5 % of layers
                         continue;
                     }
 
