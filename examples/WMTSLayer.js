@@ -77,8 +77,8 @@ requirejs(['../src/WorldWind',
                     //     continue;
                     // }
 
-                    ///////// CRS hack, doesn't help
-                    // layerCaps.tileMatrixSetLink[0].tileMatrixSetRef.supportedCRS = "EPSG4326";
+                    ///////// CRS hack, doesn't help?
+                    layerCaps.tileMatrixSetLink[0].tileMatrixSetRef.supportedCRS = "EPSG4326";
 
                     // todo add latest time
                     var latestTimeString = null;
