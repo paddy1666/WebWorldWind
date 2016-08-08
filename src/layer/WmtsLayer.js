@@ -197,6 +197,7 @@ define([
             // Form a unique string to identify cache entries.
             this.cachePath = (this.resourceUrl || this.serviceUrl) +
                 this.layerIdentifier + this.styleIdentifier + this.tileMatrixSet.identifier;
+            this.cachePathWithoutTime = this.cachePath;
             if (timeString) {
                 this.cachePath = this.cachePath + timeString;
             }
@@ -249,6 +250,23 @@ define([
                 dc.frameStatistics.incrementImageTileCount(this.currentTiles.length);
                 this.inCurrentFrame = true;
             }
+        };
+
+        WmtsLayer.prototype.updateTime = function (time, callback) {
+            // convert Date instance to ISO string
+            if(time instanceof Date){
+                time = timeString.toISOString();
+            }
+
+            if(time) {
+                this.cachePath = this.cachePathWithoutTime + time;
+            } else {
+                this.cachePath = this.cachePathWithoutTime;
+            }
+
+            this.refresh();
+
+            callback();
         };
 
         WmtsLayer.prototype.isLayerInView = function (dc) {
