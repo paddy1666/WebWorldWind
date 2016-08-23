@@ -9,36 +9,36 @@
 define([
         '../geom/Location',
         '../geom/Sector',
-        '../globe/ElevationModel',
-        '../util/WmsUrlBuilder'
+        '../globe/WcsElevationModel',
+        '../ogc/wcs/WcsUrlBuilder'
     ],
     function (Location,
               Sector,
-              ElevationModel,
-              WmsUrlBuilder) {
+              WcsElevationModel,
+              WcsUrlBuilder) {
         "use strict";
 
         /**
          * Constructs an Earth elevation model.
          * @alias EarthElevationModel
          * @constructor
-         * @augments ElevationModel
+         * @augments WcsElevationModel
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA World Wind elevation service.
          */
         var EarthElevationModel = function () {
-            ElevationModel.call(this,
-                Sector.FULL_SPHERE, new Location(45, 45), 12, "application/bil16", "EarthElevations256", 256, 256);
+            WcsElevationModel.call(this,
+                Sector.FULL_SPHERE, new Location(45, 45), 12, "image/tiff", "EarthElevations256", 256, 256);
 
             this.displayName = "Earth Elevation Model";
             this.minElevation = -11000; // Depth of Marianas Trench, in meters
             this.maxElevation = 8850; // Height of Mt. Everest
-            this.pixelIsPoint = false; // World Wind WMS elevation layers return pixel-as-area images
+            this.pixelIsPoint = false;
 
-            this.urlBuilder = new WmsUrlBuilder("http://worldwind26.arc.nasa.gov/elev",
-                "GEBCO,aster_v2,USGS-NED", "", "1.3.0");
+            this.urlBuilder = new WcsUrlBuilder(location.protocol + "//worldwind26.arc.nasa.gov/wms2",
+                "NASA_SRTM30_900m_Tiled", "1.0.0");
         };
 
-        EarthElevationModel.prototype = Object.create(ElevationModel.prototype);
+        EarthElevationModel.prototype = Object.create(WcsElevationModel.prototype);
 
         return EarthElevationModel;
     });
