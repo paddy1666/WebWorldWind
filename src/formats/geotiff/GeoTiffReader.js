@@ -129,7 +129,7 @@ define([
         });
 
         // Get geotiff file as an array buffer using XMLHttpRequest. Internal use only.
-        GeoTiffReader.prototype.requestUrl = function (url, callback) {
+        GeoTiffReader.prototype.requestUrl = function (url, callback, onerrorCallback, ontimeoutCallback) {
             var xhr = new XMLHttpRequest();
 
             xhr.open("GET", url, true);
@@ -151,10 +151,12 @@ define([
             }).bind(this);
 
             xhr.onerror = function () {
+                onerrorCallback();
                 Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval failed: " + url);
             };
 
             xhr.ontimeout = function () {
+                ontimeoutCallback();
                 Logger.log(Logger.LEVEL_WARNING, "GeoTiff retrieval timed out: " + url);
             };
 
@@ -438,9 +440,11 @@ define([
          * to the callback function as a parameter.
          *
          * @param {Function} callback A function called when GeoTiff parsing is complete.
-         *
+         * @param {Function} onerrorCallback A function called when the XMLHttpRequest transaction fails due to an
+         * error.
+         * @param {Function} ontimeoutCallback A function called in the case of a XMLHttpRequest timeout
          */
-        GeoTiffReader.prototype.readAsData = function (callback) {
+        GeoTiffReader.prototype.readAsData = function (callback, onerrorCallback, ontimeoutCallback) {
             this.requestUrl(this.url, (function () {
                 var elevationArray = [];
 
@@ -485,7 +489,7 @@ define([
                     sampleFormat[0],
                     elevationArray
                 ));
-            }).bind(this));
+            }).bind(this), onerrorCallback, ontimeoutCallback);
         };
 
         // Parse geotiff strips. Internal use only

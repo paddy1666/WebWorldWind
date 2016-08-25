@@ -571,6 +571,14 @@ define([
                     var e = document.createEvent('Event');
                     e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
                     window.dispatchEvent(e);
+                }, function () {
+                    elevationModel.removeFromCurrentRetrievals(tile.imagePath);
+                    elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
+                    Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval failed: " + url);
+                }, function () {
+                    elevationModel.removeFromCurrentRetrievals(tile.imagePath);
+                    elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
+                    Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval timed out: " + url);
                 });
 
                 this.currentRetrievals.push(tile.imagePath);
