@@ -378,8 +378,8 @@ define([
                 v = levelHeight * WWMath.clamp(t, tMin, tMax); // clamp the vertical coordinate to the level edge
                 x0 = WWMath.mod(Math.floor(u - 0.5), levelWidth);
                 x1 = WWMath.mod((x0 + 1), levelWidth);
-                y0 = Math.floor(v - 0.5);
-                y1 = y0 + 1;
+                y0 = WWMath.mod(Math.floor(v - 0.5), levelHeight);
+                y1 = WWMath.mod((y0 + 1), levelHeight);
                 xf = WWMath.fract(u - 0.5);
                 yf = WWMath.fract(v - 0.5);
                 retrieveTiles = (i == levelNumber) || (i == 0);
