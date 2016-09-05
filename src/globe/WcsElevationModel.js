@@ -556,30 +556,65 @@ define([
         WcsElevationModel.prototype.retrieveTileImage = function (tile) {
             if (this.currentRetrievals.indexOf(tile.imagePath) < 0) {
                 var url = this.resourceUrlForTile(tile, this.retrievalImageFormat),
+                    xhr = new XMLHttpRequest(),
                     elevationModel = this;
 
                 if (!url)
                     return;
 
-                var geotiffObject = new GeoTiffReader(url);
+                xhr.open("GET", url, true);
+                xhr.responseType = 'arraybuffer';
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4) {
+                        elevationModel.removeFromCurrentRetrievals(tile.imagePath);
 
-                var geoTiffData = geotiffObject.readAsData(function (elevationData) {
-                    elevationModel.loadElevationImage(tile, elevationData);
-                    elevationModel.absentResourceList.unmarkResourceAbsent(tile.imagePath);
+                        var contentType = xhr.getResponseHeader("content-type");
 
-                    // Send an event to request a redraw.
-                    var e = document.createEvent('Event');
-                    e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
-                    window.dispatchEvent(e);
-                }, function () {
+                        if (xhr.status === 200) {
+                            if (contentType === elevationModel.retrievalImageFormat) {
+                                Logger.log(Logger.LEVEL_INFO, "Elevations retrieval succeeded: " + url);
+
+                                var geotiffObject = new GeoTiffReader(url);
+                                geotiffObject.parse(xhr.response);
+                                elevationModel.loadElevationImage(tile, geotiffObject.createTypedElevationArray());
+                                elevationModel.absentResourceList.unmarkResourceAbsent(tile.imagePath);
+
+                                // Send an event to request a redraw.
+                                var e = document.createEvent('Event');
+                                e.initEvent(WorldWind.REDRAW_EVENT_TYPE, true, true);
+                                window.dispatchEvent(e);
+                            } else if (contentType === "text/xml") {
+                                elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
+                                Logger.log(Logger.LEVEL_WARNING,
+                                    "Elevations retrieval failed (" + xhr.statusText + "): " + url + ".\n "
+                                    + String.fromCharCode.apply(null, new Uint8Array(xhr.response)));
+                            } else {
+                                elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
+                                Logger.log(Logger.LEVEL_WARNING,
+                                    "Elevations retrieval failed: " + url + ". " + "Unexpected content type "
+                                    + contentType);
+                            }
+                        } else {
+                            elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
+                            Logger.log(Logger.LEVEL_WARNING,
+                                "Elevations retrieval failed (" + xhr.statusText + "): " + url);
+                        }
+                    }
+                };
+
+                xhr.onerror = function () {
                     elevationModel.removeFromCurrentRetrievals(tile.imagePath);
                     elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
                     Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval failed: " + url);
-                }, function () {
+                };
+
+                xhr.ontimeout = function () {
                     elevationModel.removeFromCurrentRetrievals(tile.imagePath);
                     elevationModel.absentResourceList.markResourceAbsent(tile.imagePath);
                     Logger.log(Logger.LEVEL_WARNING, "Elevations retrieval timed out: " + url);
-                });
+                };
+
+                xhr.send(null);
 
                 this.currentRetrievals.push(tile.imagePath);
             }
