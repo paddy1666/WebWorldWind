@@ -35,7 +35,12 @@ define([
             this.displayName = "Blue Marble";
             this.pickEnabled = false;
 
-            this.urlBuilder = new WmsUrlBuilder(location.protocol + "//worldwind25.arc.nasa.gov/wms",
+            var protocol = 'http:';
+            if (location.protocol !== 'file:') {
+                protocol = location.protocol;
+            }
+
+            this.urlBuilder = new WmsUrlBuilder(protocol + "//worldwind25.arc.nasa.gov/wms",
                 layerName || "BlueMarble-200405", "", "1.3.0");
         };
 
