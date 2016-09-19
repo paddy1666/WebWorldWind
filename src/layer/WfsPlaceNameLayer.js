@@ -9,8 +9,7 @@ define([
     '../error/ArgumentError',
     '../util/Color',
     '../util/Logger',
-    '../shapes/Placemark',
-    '../shapes/PlacemarkAttributes',
+    '../shapes/GeographicText',
     '../geom/Position',
     '../layer/RenderableLayer',
     '../geom/Sector',
@@ -19,33 +18,24 @@ define([
 ], function (ArgumentError,
              Color,
              Logger,
-             Placemark,
-             PlacemarkAttributes,
+             GeographicText,
              Position,
              RenderableLayer,
              Sector,
              WfsUrlBuilder) {
     "use strict";
 
-    var WfsPlaceNameLayer = function (placemarkAttributes) {
+    var WfsPlaceNameLayer = function () {
         RenderableLayer.call(this, "WFS Place Name");
-
-        if (placemarkAttributes) {
-            this._attributes = placemarkAttributes;
-        } else {
-            this._attributes = new PlacemarkAttributes(null);
-            this._attributes.imageColor = Color.RED;
-            this._attributes.imageScale = 3;
-        }
 
         var features = [
             "topp:wpl_oceans",
             "topp:wpl_continents",
-            //"topp:wpl_waterbodies",
-            //"topp:wpl_trenchesridges",
-            //"topp:wpl_desertsplains",
-            //"topp:wpl_lakesrivers",
-            //"topp:wpl_mountainsvalleys",
+            "topp:wpl_waterbodies",
+            "topp:wpl_trenchesridges",
+            "topp:wpl_desertsplains",
+            "topp:wpl_lakesrivers",
+            "topp:wpl_mountainsvalleys",
             "topp:wpl_countries",
             //"topp:wpl_geonet_p_pplc",
             //"topp:citiesover500k",
@@ -73,20 +63,6 @@ define([
     };
 
     WfsPlaceNameLayer.prototype = Object.create(RenderableLayer.prototype);
-
-    Object.defineProperties(Placemark.prototype, {
-
-        attributes: {
-            get: function () {
-                return this._attributes;
-            },
-            set: function (value) {
-                if (value) {
-                    this._attributes = value;
-                }
-            }
-        }
-    });
 
     WfsPlaceNameLayer.prototype.loadPlaceNameData = function (url, featureName) {
         //var url = "http://worldwind22.arc.nasa.gov/geoserver/wfs?version=1.0.0&&REQUEST=GetFeature&BBOX=-175.200012207031,-51.7000007629395,179.216674804688,78.216667175293&OUTPUTFORMAT=JSON&typeName=topp:geonet_20060905_capitals";
@@ -126,10 +102,8 @@ define([
         placeNameData.features.map(function(feature, featureIndex, features) {
             var coordinate = feature.geometry.coordinates;
                 var position = new Position(coordinate[1], coordinate[0], 0);
-                var placemark = new Placemark(position, false, self._attributes);
-                placemark.label = feature.properties.full_name_nd;
-                placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
-                self.addRenderable(placemark);
+                var placeName = new GeographicText(position, feature.properties.full_name_nd);
+                self.addRenderable(placeName);
             });
         console.log("*** done ***");
     };

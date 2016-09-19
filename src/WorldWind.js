@@ -198,6 +198,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Vec3',
         './layer/ViewControlsLayer',
         './formats/kml/util/ViewVolume',
+        './layer/WfsPlaceNameLayer',
+        './util/WfsUrlBuilder',
         './ogc/WmsCapabilities',
         './layer/WmsLayer',
         './ogc/WmsLayerCapabilities',
@@ -404,6 +406,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Vec3,
               ViewControlsLayer,
               ViewVolume,
+              WfsPlaceNameLayer,
+              WfsUrlBuilder,
               WmsCapabilities,
               WmsLayer,
               WmsLayerCapabilities,
@@ -767,6 +771,8 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Vec2'] = Vec2;
         WorldWind['Vec3'] = Vec3;
         WorldWind['ViewControlsLayer'] = ViewControlsLayer;
+        WorldWind['WfsPlaceNameLayer'] = WfsPlaceNameLayer;
+        WorldWind['WfsUrlBuilder'] = WfsUrlBuilder;
         WorldWind['WmsCapabilities'] = WmsCapabilities;
         WorldWind['WmsLayer'] = WmsLayer;
         WorldWind['WmsLayerCapabilities'] = WmsLayerCapabilities;
